@@ -11,20 +11,19 @@ import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.bluetooth.Bluetooth.ServerOrCilent;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
+import com.michael.basic7bot.Bluetooth.ServerOrCilent;
 public class chatActivity extends Activity implements OnItemClickListener,OnClickListener {
 	/** Called when the activity is first created. */
 
@@ -43,7 +42,7 @@ public class chatActivity extends Activity implements OnItemClickListener,OnClic
 	public static final String PROTOCOL_SCHEME_TCP_OBEX = "tcpobex";
 
 	private BluetoothServerSocket mserverSocket = null;
-	private ServerThread startServerThread = null;
+	//private ServerThread startServerThread = null;
 	private clientThread clientConnectThread = null;
 	private BluetoothSocket socket = null;
 	private BluetoothDevice device = null;
@@ -53,7 +52,7 @@ public class chatActivity extends Activity implements OnItemClickListener,OnClic
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(com.bluetooth.R.layout.chat);
+		setContentView(R.layout.chat);
 		mContext = this;
 		init();
 	}
@@ -77,48 +76,43 @@ public class chatActivity extends Activity implements OnItemClickListener,OnClic
 		//mListView.setAdapter(mAdapter);
 		//mListView.setOnItemClickListener(this);
 		//mListView.setFastScrollEnabled(true);
-		editMsgView= (EditText)findViewById(com.bluetooth.R.id.MessageText);
+		editMsgView= (EditText)findViewById(R.id.MessageText);
 		editMsgView.clearFocus();
 
-		sendButton= (Button)findViewById(com.bluetooth.R.id.btn_msg_send);
+		sendButton= (Button)findViewById(R.id.btn_msg_send);
 		sendButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
-				String msgText =editMsgView.getText().toString();
-				byte[] msg={(byte)0xfe,(byte)0xf5,(byte)0x02};
-				Toast.makeText(mContext, msgText, Toast.LENGTH_SHORT).show();
-				if (msgText.length()>0) {
-					msgText="测试";
-					sendMessageHandle(msg);//发送数据
-					editMsgView.setText("");
-					editMsgView.clearFocus();
-					//close InputMethodManager
-					InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-					imm.hideSoftInputFromWindow(editMsgView.getWindowToken(), 0);
-				}else
-					Toast.makeText(mContext, "发送内容不能为空！", Toast.LENGTH_SHORT).show();
+//				byte[] msg={(byte)0xfe,(byte)0xFA,0x02,0x00,0x00,0x64,0x00,0x34};
+//				byte[] msg1={0x01,0x48,0x01,0x48, 0x01,0x48,0x01,0x48};
+//				byte[] msg2={0x01,0x48,0x01,0x48,0x01,0x48};
+//					sendMessageHandle(msg);//发送数据
+//					sendMessageHandle(msg1);//发送数据
+//					sendMessageHandle(msg2);//发送数据
+				byte[] test={(byte)0xfe,(byte)0xFA,0x02,0x00,0x00,0x64,0x00,0x34,0x01,0x48,0x01,0x48, 0x01,0x48,0x01,0x48,0x01,0x48,0x01,0x48,0x01,0x48};
+				sendMessageHandle(test);
 			}
 		});
 
-		disconnectButton= (Button)findViewById(com.bluetooth.R.id.btn_disconnect);
-		disconnectButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
-				if (Bluetooth.serviceOrCilent == ServerOrCilent.CILENT)
-				{
-					shutdownClient();
-				}
-				else if (Bluetooth.serviceOrCilent == ServerOrCilent.SERVICE)
-				{
-					shutdownServer();
-				}
-				Bluetooth.isOpen = false;
-				Bluetooth.serviceOrCilent=ServerOrCilent.NONE;
-				Toast.makeText(mContext, "已断开连接！", Toast.LENGTH_SHORT).show();
-			}
-		});
+//		disconnectButton= (Button)findViewById(com.bluetooth.R.id.btn_disconnect);
+//		disconnectButton.setOnClickListener(new OnClickListener() {
+//			@Override
+//			public void onClick(View arg0) {
+//				// TODO Auto-generated method stub
+//				if (Bluetooth.serviceOrCilent == ServerOrCilent.CILENT)
+//				{
+//					shutdownClient();
+//				}
+//				else if (Bluetooth.serviceOrCilent == ServerOrCilent.SERVICE)
+//				{
+//					shutdownServer();
+//				}
+//				Bluetooth.isOpen = false;
+//				Bluetooth.serviceOrCilent=ServerOrCilent.NONE;
+//				Toast.makeText(mContext, "已断开连接！", Toast.LENGTH_SHORT).show();
+//			}
+//		});
 	}
 	/*
 	private Handler LinkDetectedHandler = new Handler() {
@@ -144,6 +138,7 @@ public class chatActivity extends Activity implements OnItemClickListener,OnClic
 	public synchronized void onPause() {
 		super.onPause();
 	}
+
 	@Override
 	public synchronized void onResume() {
 		super.onResume();
@@ -169,11 +164,14 @@ public class chatActivity extends Activity implements OnItemClickListener,OnClic
 		}
 		else if(Bluetooth.serviceOrCilent==ServerOrCilent.SERVICE)
 		{
-			startServerThread = new ServerThread();
-			startServerThread.start();
+//			startServerThread = new ServerThread();
+//			startServerThread.start();
 			Bluetooth.isOpen = true;
 		}
 	}
+
+
+
 	//开启客户端
 	private class clientThread extends Thread {
 		public void run() {
@@ -208,72 +206,75 @@ public class chatActivity extends Activity implements OnItemClickListener,OnClic
 		}
 	};
 
-	//开启服务器
-	private class ServerThread extends Thread {
-		public void run() {
+//
+//	//开启服务器
+//	private class ServerThread extends Thread {
+//		public void run() {
+//
+//			try {
+//				/* 创建一个蓝牙服务器
+//				 * 参数分别：服务器名称、UUID	 */
+//				mserverSocket = mBluetoothAdapter.listenUsingRfcommWithServiceRecord(PROTOCOL_SCHEME_RFCOMM,
+//						UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"));
+//
+//				Log.d("server", "wait cilent connect...");
+//
+//				Message msg = new Message();
+//				msg.obj = "请稍候，正在等待客户端的连接...";
+//				msg.what = 0;
+//				//LinkDetectedHandler.sendMessage(msg);
+//
+//				/* 接受客户端的连接请求 */
+//				socket = mserverSocket.accept();
+//				Log.d("server", "accept success !");
+//
+//				Message msg2 = new Message();
+//				String info = "客户端已经连接上！可以发送信息。";
+//				msg2.obj = info;
+//				msg.what = 0;
+//				//LinkDetectedHandler.sendMessage(msg2);
+//				//启动接受数据
+//				mreadThread = new readThread();
+//				mreadThread.start();
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
+//	};
+//	/* 停止服务器 */
+//	private void shutdownServer() {
+//		new Thread() {
+//			public void run() {
+//				if(startServerThread != null)
+//				{
+//					startServerThread.interrupt();
+//					startServerThread = null;
+//				}
+//				if(mreadThread != null)
+//				{
+//					mreadThread.interrupt();
+//					mreadThread = null;
+//				}
+//				try {
+//					if(socket != null)
+//					{
+//						socket.close();
+//						socket = null;
+//					}
+//					if (mserverSocket != null)
+//					{
+//						mserverSocket.close();/* 关闭服务器 */
+//						mserverSocket = null;
+//					}
+//				} catch (IOException e) {
+//					Log.e("server", "mserverSocket.close()", e);
+//				}
+//			};
+//		}.start();
+//	}
 
-			try {
-				/* 创建一个蓝牙服务器 
-				 * 参数分别：服务器名称、UUID	 */
-				mserverSocket = mBluetoothAdapter.listenUsingRfcommWithServiceRecord(PROTOCOL_SCHEME_RFCOMM,
-						UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"));
 
-				Log.d("server", "wait cilent connect...");
-
-				Message msg = new Message();
-				msg.obj = "请稍候，正在等待客户端的连接...";
-				msg.what = 0;
-				//LinkDetectedHandler.sendMessage(msg);
-				
-				/* 接受客户端的连接请求 */
-				socket = mserverSocket.accept();
-				Log.d("server", "accept success !");
-
-				Message msg2 = new Message();
-				String info = "客户端已经连接上！可以发送信息。";
-				msg2.obj = info;
-				msg.what = 0;
-				//LinkDetectedHandler.sendMessage(msg2);
-				//启动接受数据
-				mreadThread = new readThread();
-				mreadThread.start();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-	};
-	/* 停止服务器 */
-	private void shutdownServer() {
-		new Thread() {
-			public void run() {
-				if(startServerThread != null)
-				{
-					startServerThread.interrupt();
-					startServerThread = null;
-				}
-				if(mreadThread != null)
-				{
-					mreadThread.interrupt();
-					mreadThread = null;
-				}
-				try {
-					if(socket != null)
-					{
-						socket.close();
-						socket = null;
-					}
-					if (mserverSocket != null)
-					{
-						mserverSocket.close();/* 关闭服务器 */
-						mserverSocket = null;
-					}
-				} catch (IOException e) {
-					Log.e("server", "mserverSocket.close()", e);
-				}
-			};
-		}.start();
-	}
 	/* 停止客户端连接 */
 	private void shutdownClient() {
 		new Thread() {
@@ -371,7 +372,7 @@ public class chatActivity extends Activity implements OnItemClickListener,OnClic
 		}
 		else if (Bluetooth.serviceOrCilent == ServerOrCilent.SERVICE)
 		{
-			shutdownServer();
+		//	shutdownServer();
 		}
 		Bluetooth.isOpen = false;
 		Bluetooth.serviceOrCilent = ServerOrCilent.NONE;

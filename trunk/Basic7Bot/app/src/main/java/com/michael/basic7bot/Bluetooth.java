@@ -35,7 +35,7 @@ public class Bluetooth extends TabActivity {
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         mContext = this;        
-    	setContentView(com.bluetooth.R.layout.main);
+    	setContentView(R.layout.main);
         //实例化
     	mTabHost = (AnimationTabHost) getTabHost();         
         mTabHost.addTab(mTabHost.newTabSpec("Tab1")

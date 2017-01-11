@@ -17,11 +17,10 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 
-import com.bluetooth.Bluetooth.ServerOrCilent;
 
 import java.util.ArrayList;
 import java.util.Set;
-
+import com.michael.basic7bot.Bluetooth.ServerOrCilent;
 public class deviceActivity extends Activity {
 	/** Called when the activity is first created. */
 

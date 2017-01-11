@@ -7,15 +7,14 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.bluetooth.chatActivity.deviceListItem;
 
 import java.util.ArrayList;
 
 public class deviceListAdapter extends BaseAdapter {
-    private ArrayList<deviceListItem> list;
+    private ArrayList<chatActivity.deviceListItem> list;
     private LayoutInflater mInflater;
   
-    public deviceListAdapter(Context context, ArrayList<deviceListItem> l) {
+    public deviceListAdapter(Context context, ArrayList<chatActivity.deviceListItem> l) {
     	list = l;
 		mInflater = LayoutInflater.from(context);
     }
@@ -38,7 +37,7 @@ public class deviceListAdapter extends BaseAdapter {
 
     public View getView(int position, View convertView, ViewGroup parent) {
     	ViewHolder viewHolder = null;
-    	deviceListItem  item=list.get(position);
+    	chatActivity.deviceListItem item=list.get(position);
         if(convertView == null){
         	convertView = mInflater.inflate(R.layout.list_item, null);          
         	viewHolder=new ViewHolder(
