@@ -10,6 +10,7 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -136,22 +137,6 @@ public class chatActivity extends Activity implements OnItemClickListener ,OnCli
 		moveZ.setProgress(position[2]);
 		moveZ.setOnSeekBarChangeListener(this);
 
-
-//		pointx=(SeekBar)findViewById(R.id.seekBar);
-//		pointy=(SeekBar)findViewById(R.id.seekBar2);
-//		pointz=(SeekBar)findViewById(R.id.seekBar3);
-//		pointx.setMax(1500);
-//		pointy.setMax(1500);
-//		pointz.setMax(1500);
-//		pointx.setProgress(direction[0]);
-//		pointy.setProgress(direction[1]);
-//		pointz.setProgress(direction[2]);
-//		pointx.setOnSeekBarChangeListener(this);
-//		pointy.setOnSeekBarChangeListener(this);
-//		pointz.setOnSeekBarChangeListener(this);
-
-
-
 		motorButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
@@ -190,9 +175,9 @@ public class chatActivity extends Activity implements OnItemClickListener ,OnCli
 
 
 		//Move
-		upButton.setOnClickListener(new OnClickListener() {
+		upButton.setOnTouchListener(new View.OnTouchListener() {
 			@Override
-			public void onClick(View arg0) {
+			public boolean onTouch(View view, MotionEvent motionEvent) {
 				// TODO Auto-generated method stub
 				position[1]=position[1]+5;
 				change();
@@ -201,12 +186,13 @@ public class chatActivity extends Activity implements OnItemClickListener ,OnCli
 				xyz.setText("x = "+position[0]+"\n"+"y = "+position[1]+"\n"+"z = "+position[2]+"\n");
 				Log.d("Test",position[0]+"  "+position[1]+"  "+position[2]+"  ");
 				Log.d("Test",bytesToHexString(IK6));
+				return  true;
 			}
 		});
 
-		downButton.setOnClickListener(new OnClickListener() {
+		downButton.setOnTouchListener(new View.OnTouchListener() {
 			@Override
-			public void onClick(View arg0) {
+			public boolean onTouch(View view, MotionEvent motionEvent) {
 				// TODO Auto-generated method stub
 				position[1]=position[1]-5;
 				change();
@@ -215,12 +201,13 @@ public class chatActivity extends Activity implements OnItemClickListener ,OnCli
 				xyz.setText("x = "+position[0]+"\n"+"y = "+position[1]+"\n"+"z = "+position[2]+"\n");
 				Log.d("Test",position[0]+"  "+position[1]+"  "+position[2]+"  ");
 				Log.d("Test",bytesToHexString(IK6));
+				return  true;
 			}
 		});
 
-		leftButton.setOnClickListener(new OnClickListener() {
+		leftButton.setOnTouchListener(new View.OnTouchListener() {
 			@Override
-			public void onClick(View arg0) {
+			public boolean onTouch(View view, MotionEvent motionEvent) {
 				// TODO Auto-generated method stub
 				position[0]=position[0]+5;
 				change();
@@ -229,13 +216,13 @@ public class chatActivity extends Activity implements OnItemClickListener ,OnCli
 				xyz.setText("x = "+position[0]+"\n"+"y = "+position[1]+"\n"+"z = "+position[2]+"\n");
 				Log.d("Test",position[0]+"  "+position[1]+"  "+position[2]+"  ");
 				Log.d("Test",bytesToHexString(IK6));
+				return  true;
 			}
 		});
 
-		rightButton.setOnClickListener(new OnClickListener() {
+		rightButton.setOnTouchListener(new View.OnTouchListener() {
 			@Override
-			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
+			public boolean onTouch(View view, MotionEvent motionEvent) {
 				position[0]=position[0]-5;
 				change();
 				sendMessageHandle(IK6);
@@ -243,7 +230,10 @@ public class chatActivity extends Activity implements OnItemClickListener ,OnCli
 				xyz.setText("x = "+position[0]+"\n"+"y = "+position[1]+"\n"+"z = "+position[2]+"\n");
 				Log.d("Test",position[0]+"  "+position[1]+"  "+position[2]+"  ");
 				Log.d("Test",bytesToHexString(IK6));
+				return true;
 			}
+
+
 		});
 
 		//Catch
@@ -295,7 +285,7 @@ public class chatActivity extends Activity implements OnItemClickListener ,OnCli
 		/**
 		 * 设置为横屏
 		 */
-		if(getRequestedOrientation()!= ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE){
+		if(getRequestedOrientation()!=ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE){
 			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 		}
 		super.onResume();
