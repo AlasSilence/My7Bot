@@ -8,6 +8,7 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -28,35 +29,30 @@ import java.io.OutputStream;
 import java.util.UUID;
 
 import com.michael.basic7bot.Bluetooth.ServerOrCilent;
+import com.michael.basic7bot.model.Arm7Bot;
+import com.michael.basic7bot.util.RockerView;
 
-public class chatActivity extends Activity implements OnItemClickListener ,OnClickListener, SeekBar.OnSeekBarChangeListener {
+public class chatActivity extends Activity implements   SeekBar.OnSeekBarChangeListener, OnClickListener {
 	/** Called when the activity is first created. */
+	//	private Button upButton,downButton,leftButton,rightButton;
+
+
+	//  空间声明
 	private Button sendButton;
 	private Button disconnectButton;
 	private Button changemode;
 	private Button motorButton;
-	private Button upButton,downButton,leftButton,rightButton;
 	private Button catchButton,releaseButton;
-	private byte[] IK6={(byte)0xfe,(byte)0xFA,0x08,0x00,0x01,0x2F,0x00,0x64,0x08,0x00,0x08,0x00, 0x09,0x44,0x01,0x48,0x01,0x48,0x01,0x48,0x01,0x48};
-	private byte[] status={(byte)0xfe,(byte)0xf5,0x02};
-	private byte[] motorPosition={(byte)0xfe,(byte)0xf9,0x03,0x74,0x03,0x74,0x02,0x69,0x03,0x74,0x03,0x74,0x03,0x74,0x01,0x48};//16
-	private int[] position={0,175,100};
-	private int[] direction={100,100,100};
-	//deviceListAdapter mAdapter;
-	Context mContext;
 	private TextView command;
 	private TextView xyz;
 	private SeekBar moveZ;
-	private SeekBar pointx;
-	private SeekBar pointy;
-	private SeekBar pointz;
 
-	/* 一些常量，代表服务器的名称 */
+
+	/* 一些常量，代表服务器的名称 以及蓝牙变量 */
 	public static final String PROTOCOL_SCHEME_L2CAP = "btl2cap";
 	public static final String PROTOCOL_SCHEME_RFCOMM = "btspp";
 	public static final String PROTOCOL_SCHEME_BT_OBEX = "btgoep";
 	public static final String PROTOCOL_SCHEME_TCP_OBEX = "tcpobex";
-
 	private BluetoothServerSocket mserverSocket = null;
 	//private ServerThread startServerThread = null;
 	private clientThread clientConnectThread = null;
@@ -65,12 +61,21 @@ public class chatActivity extends Activity implements OnItemClickListener ,OnCli
 	private readThread mreadThread = null;;
 	private BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.chat);
-		mContext = this;
-		init();
+
+	//机械手需要使用的变量及控制
+	Arm7Bot arm7Bot=new Arm7Bot();
+
+
+
+	private chatActivity mychatActivity;
+	Context mContext;
+	private RockerView myRock;
+	private Handler updateUI;
+	public Arm7Bot getArm7Bot(){
+		return arm7Bot;
+	}
+	public int[] getPosition(){
+		return arm7Bot.getPosition();
 	}
 
 	public static String bytesToHexString(byte[] bytes) {
@@ -88,190 +93,128 @@ public class chatActivity extends Activity implements OnItemClickListener ,OnCli
 		return result;
 	}
 
-	private  void change(){
-		int j=0;
-		for(int i=2;i<7;i=i+2){
-			if(position[j]>0){
-				IK6[i]=(byte)((position[j]/128)&0x7F);
-				IK6[i+1]=(byte)(position[j++]&0x7F);
-			}
-			else{
-				IK6[i]=(byte) (((byte)((-position[j]/128)&0x7F))|0x08);
-				IK6[i+1]=(byte)(-position[j++]&0x7F);
-			}
+
+
+
+	public boolean moveXY(int x,int y){
+		int [] position=arm7Bot.getPosition();
+		arm7Bot.getPosition()[0]=x;
+		arm7Bot.getPosition()[1]=y;
+		arm7Bot.change();
+		if(arm7Bot.receiveIK6()==false){
+			arm7Bot.getPosition()[0]=position[0];
+			arm7Bot.getPosition()[1]=position[1];
+			arm7Bot.change();
+			myRock.setContext(mychatActivity);
+			return false;
+		}
+		else{
+			sendMessageHandle(arm7Bot.getIK6());
+			command.setText(bytesToHexString(arm7Bot.getIK6()));
+			xyz.setText("x = "+position[0]+"\n"+"y = "+position[1]+"\n"+"z = "+position[2]+"\n");
+			Log.d("Test",position[0]+"  "+position[1]+"  "+position[2]+"  ");
+			Log.d("Test",bytesToHexString(arm7Bot.getIK6()));
+			return true;
+		}
+	}
+
+	public boolean moveZ(int z){
+		int [] position=arm7Bot.getPosition();
+		arm7Bot.getPosition()[2]=z;
+		arm7Bot.change();
+		if(arm7Bot.receiveIK6()==false){
+			arm7Bot.getPosition()[2]=position[2];
+			arm7Bot.change();
+			myRock.setContext(mychatActivity);
+			return false;
+		}
+		else{
+			sendMessageHandle(arm7Bot.getIK6());
+			command.setText(bytesToHexString(arm7Bot.getIK6()));
+			xyz.setText("x = "+position[0]+"\n"+"y = "+position[1]+"\n"+"z = "+position[2]+"\n");
+			Log.d("Test",position[0]+"  "+position[1]+"  "+position[2]+"  ");
+			Log.d("Test",bytesToHexString(arm7Bot.getIK6()));
+			return true;
 		}
 	}
 
 
-	private void changdirection(){
-		int j=0;
-		for(int i=8;i<13;i=i+2){
-			if(direction[j]>0){
-				IK6[i]=(byte)((direction[j]/128)&0x7F);
-				IK6[i+1]=(byte)(direction[j++]&0x7F);
-			}
-			else{
-				IK6[i]=(byte) (((byte)((-direction[j]/128)&0x7F))|0x08);
-				IK6[i+1]=(byte)(-direction[j++]&0x7F);
-			}
-		}
-
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.chat2);
+		mContext = this;
+		mychatActivity=this;
+		init();
 	}
 
 	private void init() {
 		motorButton=(Button)findViewById(R.id.btn_motor);
+		motorButton.setOnClickListener(this);
 		changemode=(Button)findViewById(R.id.btn_mode2);
+		changemode.setOnClickListener(this);
 		disconnectButton=(Button)findViewById(R.id.btn_disconnect);
+		disconnectButton.setOnClickListener(this);
 		sendButton= (Button)findViewById(R.id.btn_msg_send);
-		upButton=(Button)findViewById(R.id.btn_up);
-		downButton=(Button)findViewById(R.id.btn_down);
-		leftButton=(Button)findViewById(R.id.btn_left);
-		rightButton=(Button)findViewById(R.id.btn_right);
+		sendButton.setOnClickListener(this);
 		releaseButton=(Button)findViewById(R.id.btn_release);
+		releaseButton.setOnClickListener(this);
 		catchButton=(Button)findViewById(R.id.btn_catch);
+		catchButton.setOnClickListener(this);
+
+		//xyz坐标及命令显示
 		xyz=(TextView)findViewById(R.id.textView_Positive);
 		command=(TextView)findViewById(R.id.textView_Command);
-		//Move Z!
+
+		//z轴移动
 		moveZ=(SeekBar)findViewById(R.id.seekBar);
-		moveZ.setMax(435);
-		moveZ.setProgress(position[2]);
+		moveZ.setMax(300);
 		moveZ.setOnSeekBarChangeListener(this);
+		moveZ.setProgress(arm7Bot.getPosition()[2]+50);
+		moveZ.setProgress(arm7Bot.getPosition()[2]+50);
+		//自定义移动控件myRock
+		myRock=(RockerView)findViewById(R.id.view) ;
+		myRock.setContext(this);
 
-		motorButton.setOnClickListener(new OnClickListener() {
+
+		//定义hangdle用来接收线程传来的传感器数据，并对数据进行处理，将其转换成16进制模式。
+		updateUI=new Handler(){
 			@Override
-			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
-				command.setText(bytesToHexString(motorPosition));
-				sendMessageHandle(motorPosition);
-			}
-		});
-
-		changemode.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
-				byte[] test={(byte)0xfe,(byte)0xf5,0x02};
-				sendMessageHandle(status);
-				command.setText(bytesToHexString(test));
-				xyz.setText("x = "+position[0]+"\n"+"y = "+position[1]+"\n"+"z = "+position[2]+"\n");
-				Log.d("Test",position[0]+"  "+position[1]+"  "+position[2]+"  ");
-				Log.d("Test",bytesToHexString(IK6));
-			}
-		});
-
-		sendButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
-				byte[] test={(byte)0xfe,(byte)0xFA,0x08,0x00,0x01,0x2F,0x00,0x64,0x08,0x00,0x08,0x00, 0x09,0x44,0x01,0x48,0x01,0x48,0x01,0x48,0x01,0x48};
-				IK6=test;
-				sendMessageHandle(test);
-				command.setText(bytesToHexString(test));
-				xyz.setText("x = "+position[0]+"\n"+"y = "+position[1]+"\n"+"z = "+position[2]+"\n");
-				Log.d("Test",position[0]+"  "+position[1]+"  "+position[2]+"  ");
-				Log.d("Test",bytesToHexString(test));
-			}
-		});
-
-
-		//Move
-		upButton.setOnTouchListener(new View.OnTouchListener() {
-			@Override
-			public boolean onTouch(View view, MotionEvent motionEvent) {
-				// TODO Auto-generated method stub
-				position[1]=position[1]+5;
-				change();
-				sendMessageHandle(IK6);
-				command.setText(bytesToHexString(IK6));
-				xyz.setText("x = "+position[0]+"\n"+"y = "+position[1]+"\n"+"z = "+position[2]+"\n");
-				Log.d("Test",position[0]+"  "+position[1]+"  "+position[2]+"  ");
-				Log.d("Test",bytesToHexString(IK6));
-				return  true;
-			}
-		});
-
-		downButton.setOnTouchListener(new View.OnTouchListener() {
-			@Override
-			public boolean onTouch(View view, MotionEvent motionEvent) {
-				// TODO Auto-generated method stub
-				position[1]=position[1]-5;
-				change();
-				sendMessageHandle(IK6);
-				command.setText(bytesToHexString(IK6));
-				xyz.setText("x = "+position[0]+"\n"+"y = "+position[1]+"\n"+"z = "+position[2]+"\n");
-				Log.d("Test",position[0]+"  "+position[1]+"  "+position[2]+"  ");
-				Log.d("Test",bytesToHexString(IK6));
-				return  true;
-			}
-		});
-
-		leftButton.setOnTouchListener(new View.OnTouchListener() {
-			@Override
-			public boolean onTouch(View view, MotionEvent motionEvent) {
-				// TODO Auto-generated method stub
-				position[0]=position[0]+5;
-				change();
-				sendMessageHandle(IK6);
-				command.setText(bytesToHexString(IK6));
-				xyz.setText("x = "+position[0]+"\n"+"y = "+position[1]+"\n"+"z = "+position[2]+"\n");
-				Log.d("Test",position[0]+"  "+position[1]+"  "+position[2]+"  ");
-				Log.d("Test",bytesToHexString(IK6));
-				return  true;
-			}
-		});
-
-		rightButton.setOnTouchListener(new View.OnTouchListener() {
-			@Override
-			public boolean onTouch(View view, MotionEvent motionEvent) {
-				position[0]=position[0]-5;
-				change();
-				sendMessageHandle(IK6);
-				command.setText(bytesToHexString(IK6));
-				xyz.setText("x = "+position[0]+"\n"+"y = "+position[1]+"\n"+"z = "+position[2]+"\n");
-				Log.d("Test",position[0]+"  "+position[1]+"  "+position[2]+"  ");
-				Log.d("Test",bytesToHexString(IK6));
-				return true;
-			}
-
-
-		});
-
-		//Catch
-		catchButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
-				IK6[20]=0;
-				IK6[21]=0;
-				sendMessageHandle(IK6);
-			}
-		});
-
-		releaseButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
-				IK6[20]=0x01;
-				IK6[21]=0x48;
-				sendMessageHandle(IK6);
-			}
-		});
-
-
-		disconnectButton= (Button)findViewById(R.id.btn_disconnect);
-		disconnectButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
-				if (Bluetooth.serviceOrCilent == ServerOrCilent.CILENT)
-				{
-					shutdownClient();
+			public void handleMessage(Message msg){
+				super.handleMessage(msg);
+				if(msg.what==1){
+					Bundle temp=(Bundle)msg.obj;
+					int[] receiver=temp.getIntArray("receiver");
+					byte[] ttemp=new byte[receiver.length];
+					if(receiver.length==17){
+						for(int i=0;i<receiver.length;i++){
+							ttemp[i]=(byte)receiver[i];
+						}
+						arm7Bot.analysisReceived(receiver);
+						command.setText(bytesToHexString(ttemp));
+					}
 				}
-				Bluetooth.isOpen = false;
-				Bluetooth.serviceOrCilent=ServerOrCilent.NONE;
-				Toast.makeText(mContext, "已断开连接！", Toast.LENGTH_SHORT).show();
 			}
-		});
+		};
+	}
+
+
+	@Override
+	public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
+		int[] position=arm7Bot.getPosition();
+		progress=progress-50;
+		arm7Bot.getPosition()[2]=progress;
+		moveZ(progress);
+	}
+
+	@Override
+	public void onStartTrackingTouch(SeekBar seekBar) {
+
+	}
+
+	@Override
+	public void onStopTrackingTouch(SeekBar seekBar) {
+
 	}
 
 
@@ -319,54 +262,77 @@ public class chatActivity extends Activity implements OnItemClickListener ,OnCli
 	}
 
 	@Override
-	public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
-		position[2]=progress;
-		change();
-		sendMessageHandle(IK6);
-		command.setText(bytesToHexString(IK6));
+	protected void onDestroy() {
+		super.onDestroy();
+
+		if (Bluetooth.serviceOrCilent == ServerOrCilent.CILENT)
+		{
+			shutdownClient();
+		}
+		else if (Bluetooth.serviceOrCilent == ServerOrCilent.SERVICE)
+		{
+			//	shutdownServer();
+		}
+		Bluetooth.isOpen = false;
+		Bluetooth.serviceOrCilent = ServerOrCilent.NONE;
+	}
+	private void messageShow(byte[] message){
+		int[] position=arm7Bot.getPosition();
+		command.setText(bytesToHexString(message));
 		xyz.setText("x = "+position[0]+"\n"+"y = "+position[1]+"\n"+"z = "+position[2]+"\n");
 		Log.d("Test",position[0]+"  "+position[1]+"  "+position[2]+"  ");
-		Log.d("Test",bytesToHexString(IK6));
-//		if(seekBar.getId()==R.id.seekBar){
-//			direction[0]=progress;
-//			changdirection();
-//			sendMessageHandle(IK6);
-//			command.setText(bytesToHexString(IK6));
-//			xyz.setText("vec56.x = "+direction[0]+"\n"+"vec56.y = "+direction[1]+"\n"+"vec56.z = "+direction[2]+"\n");
-//			Log.d("Test",direction[0]+"  "+direction[1]+"  "+direction[2]+"  ");
-//			Log.d("Test",bytesToHexString(IK6));
-//		}
-//		else if(seekBar.getId()==R.id.seekBar2){
-//			direction[1]=progress;
-//			changdirection();
-//			sendMessageHandle(IK6);
-//			command.setText(bytesToHexString(IK6));
-//			xyz.setText("x = "+direction[0]+"\n"+"y = "+direction[1]+"\n"+"z = "+direction[2]+"\n");
-//			Log.d("Test",direction[0]+"  "+direction[1]+"  "+direction[2]+"  ");
-//			Log.d("Test",bytesToHexString(IK6));
-//		}
-//		else if(seekBar.getId()==R.id.seekBar3){
-//			direction[2]=-progress;
-//			changdirection();
-//			sendMessageHandle(IK6);
-//			command.setText(bytesToHexString(IK6));
-//			xyz.setText("x = "+direction[0]+"\n"+"y = "+direction[1]+"\n"+"z = "+direction[2]+"\n");
-//			Log.d("Test",direction[0]+"  "+direction[1]+"  "+direction[2]+"  ");
-//			Log.d("Test",bytesToHexString(IK6));
-//		}
+		Log.d("Test",bytesToHexString(arm7Bot.getIK6()));
 	}
 
 	@Override
-	public void onStartTrackingTouch(SeekBar seekBar) {
+	public void onClick(View view) {
+		if(view.getId()==R.id.btn_mode2){
+			// TODO Auto-generated method stub
+			byte[] test={(byte)0xfe,(byte)0xf5,0x02};
+			sendMessageHandle(arm7Bot.getStatus());
+			messageShow(test);
+		}
+		else if(view.getId()==R.id.btn_catch){
+			arm7Bot.getIK6()[20]=0;
+			arm7Bot.getIK6()[21]=0;
+			int[] postion=arm7Bot.getPosition();
+			moveXY(postion[0],postion[1]);
+		}
+		else if(view.getId()==R.id.btn_release){
+			arm7Bot.getIK6()[20]=0x01;
+			arm7Bot.getIK6()[21]=0x48;
+			int[] postion=arm7Bot.getPosition();
+			moveXY(postion[0],postion[1]);
+		}
+		else if(view.getId()==R.id.btn_msg_send){
+			byte[] test={(byte)0xfe,(byte)0xFA,0x08,0x00,0x01,0x2F,0x00,0x64,0x08,0x00,0x08,0x00, 0x09,0x44,0x01,0x48,0x01,0x48,0x01,0x48,0x01,0x48};
+			arm7Bot.setIK6(test);
+			sendMessageHandle(test);
+			int[] temp={0,175,100};
+			arm7Bot.setPosition(temp);
+			moveZ.setProgress(temp[2]+50);
+			moveZ.setProgress(temp[2]+50);
+			myRock.setContext(mychatActivity);
+			messageShow(arm7Bot.getIK6());
+		}
+		else if(view.getId()==R.id.btn_disconnect){
+			if (Bluetooth.serviceOrCilent == ServerOrCilent.CILENT)
+			{
+				shutdownClient();
+			}
+			Bluetooth.isOpen = false;
+			Bluetooth.serviceOrCilent=ServerOrCilent.NONE;
+			Toast.makeText(mContext, "已断开连接！", Toast.LENGTH_SHORT).show();
+		}
+		else if(view.getId()==R.id.btn_motor){
+			command.setText(bytesToHexString(arm7Bot.getMotorPosition()));
+			sendMessageHandle(arm7Bot.getMotorPosition());
+		}
+
 
 	}
 
-	@Override
-	public void onStopTrackingTouch(SeekBar seekBar) {
-
-	}
-
-
+	/*-------------------------------------------蓝牙相关--------------------------------------------------*/
 	//开启客户端
 	private class clientThread extends Thread {
 		public void run() {
@@ -454,7 +420,6 @@ public class chatActivity extends Activity implements OnItemClickListener ,OnCli
 	//读取数据
 	private class readThread extends Thread {
 		public void run() {
-
 			byte[] buffer = new byte[1024];
 			int bytes;
 			InputStream mmInStream = null;
@@ -470,16 +435,18 @@ public class chatActivity extends Activity implements OnItemClickListener ,OnCli
 					// Read from the InputStream
 					if( (bytes = mmInStream.read(buffer)) > 0 )
 					{
-						byte[] buf_data = new byte[bytes];
+						int[] buf_data = new int[bytes];
 						for(int i=0; i<bytes; i++)
 						{
 							buf_data[i] = buffer[i];
 						}
-						String s = new String(buf_data);
+
+						Bundle data=new Bundle();
+						data.putIntArray("receiver",buf_data);
 						Message msg = new Message();
-						msg.obj = s;
+						msg.obj = data;
 						msg.what = 1;
-						//LinkDetectedHandler.sendMessage(msg);
+						updateUI.sendMessage(msg);
 					}
 				} catch (IOException e) {
 					try {
@@ -495,21 +462,9 @@ public class chatActivity extends Activity implements OnItemClickListener ,OnCli
 	}
 
 
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
 
-		if (Bluetooth.serviceOrCilent == ServerOrCilent.CILENT)
-		{
-			shutdownClient();
-		}
-		else if (Bluetooth.serviceOrCilent == ServerOrCilent.SERVICE)
-		{
-			//	shutdownServer();
-		}
-		Bluetooth.isOpen = false;
-		Bluetooth.serviceOrCilent = ServerOrCilent.NONE;
-	}
+
+
 	public class SiriListItem {
 		String message;
 		boolean isSiri;
@@ -520,14 +475,9 @@ public class chatActivity extends Activity implements OnItemClickListener ,OnCli
 		}
 	}
 
-	@Override
-	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-		// TODO Auto-generated method stub
-	}
-	@Override
-	public void onClick(View arg0) {
-		// TODO Auto-generated method stub
-	}
+
+
+
 	public class deviceListItem {
 		String message;
 		boolean isSiri;
