@@ -19,7 +19,7 @@ public class MyRocker {
 	private float Outer_R, Inner_R;//radius of outer and inner circle
 	private boolean isRockerTouched = false;//when the rocker is touched at ACTION_DOWN, set true
 	private float degree = 0;//the degree between current position and center position
-	
+
 	/**
 	 * <b>This constructor is for SufaceView!</b>
 	 * @param ScreenWidth  screen width
@@ -37,7 +37,7 @@ public class MyRocker {
 		//if the x_position and y_position is between 0.0~1.0f
 		if(x_position > 0 && x_position < 1 && y_position > 0 && y_position < 1){
 			this.x_position = x_position;
-			this.y_position = y_position;	
+			this.y_position = y_position;
 		}else{//default 0.5f
 			this.x_position = 0.5f;
 			this.y_position = 0.5f;
@@ -51,7 +51,7 @@ public class MyRocker {
 		this.InnerCenter_X = OuterCenter_X;
 		this.InnerCenter_Y = OuterCenter_Y;
 	}
-	
+
 	/**
 	 * This constructor is for ImageView!<br/>
 	 * When this View is added in the xml, 
@@ -86,7 +86,7 @@ public class MyRocker {
 		paint.setColor(Color.GRAY);
 		canvas.drawCircle(InnerCenter_X, InnerCenter_Y, Inner_R, paint);
 	}
-	
+
 	protected void drawLine(Canvas canvas){
 		if(OuterCenter_X != InnerCenter_X || OuterCenter_Y != InnerCenter_Y){
 			paint.setColor(Color.RED);
@@ -94,7 +94,7 @@ public class MyRocker {
 			canvas.drawLine(OuterCenter_X, OuterCenter_Y, InnerCenter_X, InnerCenter_Y, paint);
 		}
 	}
-	
+
 	/**
 	 * Call this method when ACTION_DOWN 
 	 * @param x
@@ -111,7 +111,7 @@ public class MyRocker {
 		//calculate the degree
 		this.degree = (float) Math.atan((x - OuterCenter_X) / (y - OuterCenter_Y));
 	}
-	
+
 	/**
 	 * Call this method when ACTION_MOVE 
 	 * @param x
@@ -138,7 +138,7 @@ public class MyRocker {
 			}
 		}
 	}
-	
+
 	/**
 	 * Call this method when ACTION_UP 
 	 */
@@ -148,7 +148,7 @@ public class MyRocker {
 		isRockerTouched = false;
 		this.degree = 0;
 	}
-	
+
 	/**
 	 * Calculate the distance between two dots
 	 * @param x1
@@ -169,6 +169,6 @@ public class MyRocker {
 	public float getDegree() {
 		return degree;
 	}
-	
+
 }
 

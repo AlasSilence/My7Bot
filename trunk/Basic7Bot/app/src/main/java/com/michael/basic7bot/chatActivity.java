@@ -43,9 +43,12 @@ public class chatActivity extends Activity implements   SeekBar.OnSeekBarChangeL
 	private Button changemode;
 	private Button motorButton;
 	private Button catchButton,releaseButton;
-	private TextView command;
+	//private TextView command;
 	private TextView xyz;
+	private TextView vec67;
 	private SeekBar moveZ;
+	private SeekBar vec67X,vec67Y,vec67Z;
+
 
 
 	/* 一些常量，代表服务器的名称 以及蓝牙变量 */
@@ -93,7 +96,11 @@ public class chatActivity extends Activity implements   SeekBar.OnSeekBarChangeL
 		return result;
 	}
 
-
+	public void newPostion(){
+		arm7Bot.newChange();
+		sendMessageHandle(arm7Bot.getIK6());
+		vec67.setText("x = "+vec67X.getProgress()+"\n"+"y = "+vec67Y.getProgress()+"\n"+"Z = "+vec67Z.getProgress()+"\n");
+	}
 
 
 	public boolean moveXY(int x,int y){
@@ -110,7 +117,7 @@ public class chatActivity extends Activity implements   SeekBar.OnSeekBarChangeL
 		}
 		else{
 			sendMessageHandle(arm7Bot.getIK6());
-			command.setText(bytesToHexString(arm7Bot.getIK6()));
+			//command.setText(bytesToHexString(arm7Bot.getIK6()));
 			xyz.setText("x = "+position[0]+"\n"+"y = "+position[1]+"\n"+"z = "+position[2]+"\n");
 			Log.d("Test",position[0]+"  "+position[1]+"  "+position[2]+"  ");
 			Log.d("Test",bytesToHexString(arm7Bot.getIK6()));
@@ -130,7 +137,7 @@ public class chatActivity extends Activity implements   SeekBar.OnSeekBarChangeL
 		}
 		else{
 			sendMessageHandle(arm7Bot.getIK6());
-			command.setText(bytesToHexString(arm7Bot.getIK6()));
+			//command.setText(bytesToHexString(arm7Bot.getIK6()));
 			xyz.setText("x = "+position[0]+"\n"+"y = "+position[1]+"\n"+"z = "+position[2]+"\n");
 			Log.d("Test",position[0]+"  "+position[1]+"  "+position[2]+"  ");
 			Log.d("Test",bytesToHexString(arm7Bot.getIK6()));
@@ -162,9 +169,27 @@ public class chatActivity extends Activity implements   SeekBar.OnSeekBarChangeL
 		catchButton=(Button)findViewById(R.id.btn_catch);
 		catchButton.setOnClickListener(this);
 
+		/*****转轴方向测试*****/
+		vec67=(TextView)findViewById(R.id.vec67);
+		vec67X=(SeekBar)findViewById(R.id.vec67_x) ;
+		vec67Y=(SeekBar)findViewById(R.id.vec67_y);
+		vec67Z=(SeekBar)findViewById(R.id.vec67_z);
+		vec67Z.setMax(90);
+		vec67Y.setMax(500);
+		vec67X.setMax(500);
+		int[] temp=arm7Bot.getDirection();
+		vec67X.setProgress(temp[0]);
+		vec67Y.setProgress(temp[1]);
+		vec67Z.setProgress(temp[2]);
+		vec67X.setOnSeekBarChangeListener(this);
+		vec67Y.setOnSeekBarChangeListener(this);
+		vec67Z.setOnSeekBarChangeListener(this);
+
+
+
 		//xyz坐标及命令显示
 		xyz=(TextView)findViewById(R.id.textView_Positive);
-		command=(TextView)findViewById(R.id.textView_Command);
+		//command=(TextView)findViewById(R.id.textView_Command);
 
 		//z轴移动
 		moveZ=(SeekBar)findViewById(R.id.seekBar);
@@ -191,7 +216,7 @@ public class chatActivity extends Activity implements   SeekBar.OnSeekBarChangeL
 							ttemp[i]=(byte)receiver[i];
 						}
 						arm7Bot.analysisReceived(receiver);
-						command.setText(bytesToHexString(ttemp));
+						//command.setText(bytesToHexString(ttemp));
 					}
 				}
 			}
@@ -199,12 +224,42 @@ public class chatActivity extends Activity implements   SeekBar.OnSeekBarChangeL
 	}
 
 
+
 	@Override
 	public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
-		int[] position=arm7Bot.getPosition();
-		progress=progress-50;
-		arm7Bot.getPosition()[2]=progress;
-		moveZ(progress);
+		if(seekBar.getId()==moveZ.getId()){
+			int[] position=arm7Bot.getPosition();
+			progress=progress-50;
+			arm7Bot.getPosition()[2]=progress;
+			moveZ(progress);
+		}
+		else if(seekBar.getId()==vec67X.getId()){
+			int[] temp=arm7Bot.getDirection();
+			progress=progress-250;
+			arm7Bot.getDirection()[0]=progress;
+			newPostion();
+		}
+		else if(seekBar.getId()==vec67Y.getId()){
+			int[] temp=arm7Bot.getDirection();
+			progress=progress-250;
+			arm7Bot.getDirection()[1]=progress;
+			newPostion();
+		}
+		else if(seekBar.getId()==vec67Z.getId()){
+			int lengh=1000;
+			//按角度移动机械手
+			if(progress<45){
+				arm7Bot.getDirection()[0]=Math.abs((int)(lengh*Math.cos(((45-progress)*Math.PI)/180)));
+				arm7Bot.getDirection()[1]=-Math.abs((int)(lengh*Math.sin(((45-progress)*Math.PI)/180)));
+			}
+			else{
+				arm7Bot.getDirection()[0]=Math.abs((int)(lengh*Math.cos(((progress-45)*Math.PI)/180)));
+				arm7Bot.getDirection()[1]=Math.abs((int)(lengh*Math.sin(((progress-45)*Math.PI)/180)));
+			}
+			Log.d("what",arm7Bot.getDirection()[0]+"  "+arm7Bot.getDirection()[1]);
+			newPostion();
+
+		}
 	}
 
 	@Override
@@ -278,7 +333,7 @@ public class chatActivity extends Activity implements   SeekBar.OnSeekBarChangeL
 	}
 	private void messageShow(byte[] message){
 		int[] position=arm7Bot.getPosition();
-		command.setText(bytesToHexString(message));
+		//command.setText(bytesToHexString(message));
 		xyz.setText("x = "+position[0]+"\n"+"y = "+position[1]+"\n"+"z = "+position[2]+"\n");
 		Log.d("Test",position[0]+"  "+position[1]+"  "+position[2]+"  ");
 		Log.d("Test",bytesToHexString(arm7Bot.getIK6()));
@@ -325,7 +380,7 @@ public class chatActivity extends Activity implements   SeekBar.OnSeekBarChangeL
 			Toast.makeText(mContext, "已断开连接！", Toast.LENGTH_SHORT).show();
 		}
 		else if(view.getId()==R.id.btn_motor){
-			command.setText(bytesToHexString(arm7Bot.getMotorPosition()));
+			//command.setText(bytesToHexString(arm7Bot.getMotorPosition()));
 			sendMessageHandle(arm7Bot.getMotorPosition());
 		}
 

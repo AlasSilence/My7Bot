@@ -4,6 +4,7 @@ import android.util.Log;
 
 /**
  * Created by Michael on 2016/9/9 0009.
+ * modify by Michael on 2017/01/24
  */
 public class Arm7Bot {
     private static int SERVO_NUM=7;
@@ -15,7 +16,6 @@ public class Arm7Bot {
     private double[] thetaMax = {Math.PI, Math.PI, 2.0071287, 2.9670596, Math.PI, Math.PI, Math.PI/2};
 
     double a=120.0, b=40.0, c=198.50, d=30.05, e=77.80, f=22.10, g=12.0, h = 29.42;
-
     private byte[] IK6={(byte)0xfe,(byte)0xFA,0x08,0x00,0x01,0x2F,0x00,0x64,0x08,0x00,0x08,0x00, 0x09,0x44,0x01,0x48,0x01,0x48,0x01,0x48,0x01,0x48};
     private byte[] status={(byte)0xfe,(byte)0xf5,0x02};
     private byte[] motorPosition={(byte)0xfe,(byte)0xf9,0x03,0x74,0x03,0x74,0x02,0x69,0x03,0x74,0x03,0x74,0x03,0x74,0x01,0x48};//16
@@ -27,10 +27,10 @@ public class Arm7Bot {
     PVector[] joint = new PVector[9];
     private PVector j6=new PVector(),vec56 = new PVector(),vec67 = new PVector();
 
-   public Arm7Bot(){
-       for(int i=0;i<joint.length;i++){
-           joint[i]=new PVector();
-       }
+    public Arm7Bot(){
+        for(int i=0;i<joint.length;i++){
+            joint[i]=new PVector();
+        }
         for(int i=0;i<theta.length;i++){
             theta[i]=0;
         }
@@ -88,6 +88,23 @@ public class Arm7Bot {
             }
         }
     }
+
+    public void newChange(){
+        //x,y成比例可以保持他他的向量朝向
+        Log.d("ni","x = "+direction[0]+"\t"+"y = "+direction[1]+"\t"+"z = "+direction[2]+"\t");
+        int j=0;
+        for(int i=14;i<19;i=i+2){
+            if(direction[j]>0){
+                IK6[i]=(byte)((direction[j]/128)&0x7F);
+                IK6[i+1]=(byte)(direction[j++]&0x7F);
+            }
+            else{
+                IK6[i]=(byte) (((byte)((-direction[j]/128)&0x7F))|0x08);
+                IK6[i+1]=(byte)(-direction[j++]&0x7F);
+            }
+        }
+    }
+
     /*****上位机接受到arduinoDue发回的数据并解析现在各舵机的角度*****/
     public static void analysisReceived(int[] command){
         int[] motor=new int[7];
@@ -110,10 +127,6 @@ public class Arm7Bot {
         }
         Log.d("Di",result);
     }
-
-
-
-
 
 
     /*****加装自己受到了command信号 进行解析，查看发送的指令是否能够移动*****/
@@ -140,7 +153,7 @@ public class Arm7Bot {
 
         theta6 = ((double)(data[9])) * 9 / 50;
         if(checkIK6(j6,vec56,vec67)==0)
-        return true;
+            return true;
         else
             return false;
     }
@@ -218,6 +231,7 @@ public class Arm7Bot {
             return 2;
         }
     }
+
     public int checkIk3(PVector pt){
         double x = pt.x, y = pt.y, z = pt.z;
         int status = 1;

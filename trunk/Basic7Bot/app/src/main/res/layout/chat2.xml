@@ -5,7 +5,6 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -75,20 +74,46 @@
         android:layout_below="@+id/seekBar">
 
         <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Small Text"
+            android:id="@+id/vec67"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="0.21" />
+
+        <SeekBar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/vec67.x"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="0.21"
+            android:indeterminate="false" />
+
+        <SeekBar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/vec67.y"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="0.21"
+            android:indeterminate="false" />
+
+        <SeekBar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/vec67.z"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="0.21"
+            android:indeterminate="false" />
+
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="76dp"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="坐标"
             android:id="@+id/textView_Positive"
-            android:layout_weight="0.55" />
+            android:layout_weight="0.21" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="93dp"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="命令"
-            android:id="@+id/textView_Command"
-            android:layout_weight="0.14" />
     </LinearLayout>
 
     <SeekBar
