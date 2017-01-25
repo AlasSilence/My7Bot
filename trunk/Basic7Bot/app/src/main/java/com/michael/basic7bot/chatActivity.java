@@ -32,7 +32,7 @@ import com.michael.basic7bot.Bluetooth.ServerOrCilent;
 import com.michael.basic7bot.model.Arm7Bot;
 import com.michael.basic7bot.util.RockerView;
 
-public class chatActivity extends Activity implements   SeekBar.OnSeekBarChangeListener, OnClickListener {
+public class chatActivity extends Activity implements OnClickListener {
 	/** Called when the activity is first created. */
 	//	private Button upButton,downButton,leftButton,rightButton;
 
@@ -43,13 +43,8 @@ public class chatActivity extends Activity implements   SeekBar.OnSeekBarChangeL
 	private Button changemode;
 	private Button motorButton;
 	private Button catchButton,releaseButton;
-	//private TextView command;
+	private Button rise,drop;
 	private TextView xyz;
-	private TextView vec67;
-	private SeekBar moveZ;
-	private SeekBar vec67X,vec67Y,vec67Z;
-
-
 
 	/* 一些常量，代表服务器的名称 以及蓝牙变量 */
 	public static final String PROTOCOL_SCHEME_L2CAP = "btl2cap";
@@ -57,7 +52,7 @@ public class chatActivity extends Activity implements   SeekBar.OnSeekBarChangeL
 	public static final String PROTOCOL_SCHEME_BT_OBEX = "btgoep";
 	public static final String PROTOCOL_SCHEME_TCP_OBEX = "tcpobex";
 	private BluetoothServerSocket mserverSocket = null;
-	//private ServerThread startServerThread = null;
+
 	private clientThread clientConnectThread = null;
 	private BluetoothSocket socket = null;
 	private BluetoothDevice device = null;
@@ -67,8 +62,6 @@ public class chatActivity extends Activity implements   SeekBar.OnSeekBarChangeL
 
 	//机械手需要使用的变量及控制
 	Arm7Bot arm7Bot=new Arm7Bot();
-
-
 
 	private chatActivity mychatActivity;
 	Context mContext;
@@ -80,6 +73,7 @@ public class chatActivity extends Activity implements   SeekBar.OnSeekBarChangeL
 	public int[] getPosition(){
 		return arm7Bot.getPosition();
 	}
+
 
 	public static String bytesToHexString(byte[] bytes) {
 		String result = "";
@@ -99,7 +93,7 @@ public class chatActivity extends Activity implements   SeekBar.OnSeekBarChangeL
 	public void newPostion(){
 		arm7Bot.newChange();
 		sendMessageHandle(arm7Bot.getIK6());
-		vec67.setText("x = "+vec67X.getProgress()+"\n"+"y = "+vec67Y.getProgress()+"\n"+"Z = "+vec67Z.getProgress()+"\n");
+//		vec67.setText("x = "+vec67X.getProgress()+"\n"+"y = "+vec67Y.getProgress()+"\n"+"Z = "+vec67Z.getProgress()+"\n");
 	}
 
 
@@ -146,6 +140,7 @@ public class chatActivity extends Activity implements   SeekBar.OnSeekBarChangeL
 	}
 
 
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -168,35 +163,65 @@ public class chatActivity extends Activity implements   SeekBar.OnSeekBarChangeL
 		releaseButton.setOnClickListener(this);
 		catchButton=(Button)findViewById(R.id.btn_catch);
 		catchButton.setOnClickListener(this);
+		drop=(Button)findViewById(R.id.btn_drop);
+		rise=(Button)findViewById(R.id.btn_rise);
+
+
+		drop.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View view, MotionEvent motionEvent) {
+				// TODO Auto-generated method stub
+				int[] position=arm7Bot.getPosition();
+				arm7Bot.getPosition()[2]=position[2]-1;
+				moveZ(position[2]-1);
+				return  true;
+			}
+		});
+		rise.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View view, MotionEvent motionEvent) {
+				// TODO Auto-generated method stub
+				int[] position=arm7Bot.getPosition();
+				arm7Bot.getPosition()[2]=position[2]+1;
+				moveZ(position[2]+1);
+				return  true;
+			}
+		});
+
 
 		/*****转轴方向测试*****/
-		vec67=(TextView)findViewById(R.id.vec67);
-		vec67X=(SeekBar)findViewById(R.id.vec67_x) ;
-		vec67Y=(SeekBar)findViewById(R.id.vec67_y);
-		vec67Z=(SeekBar)findViewById(R.id.vec67_z);
-		vec67Z.setMax(90);
-		vec67Y.setMax(500);
-		vec67X.setMax(500);
-		int[] temp=arm7Bot.getDirection();
-		vec67X.setProgress(temp[0]);
-		vec67Y.setProgress(temp[1]);
-		vec67Z.setProgress(temp[2]);
-		vec67X.setOnSeekBarChangeListener(this);
-		vec67Y.setOnSeekBarChangeListener(this);
-		vec67Z.setOnSeekBarChangeListener(this);
+//		vec67=(TextView)findViewById(R.id.vec67);
+//		vec67X=(SeekBar)findViewById(R.id.vec67_x) ;
+//		vec67Y=(SeekBar)findViewById(R.id.vec67_y);
+//		vec67Z=(SeekBar)findViewById(R.id.vec67_z);
+//		vec67Z.setMax(90);
+//		vec67Y.setMax(500);
+//		vec67X.setMax(500);
+//		int[] temp=arm7Bot.getDirection();
+//		vec67X.setProgress(temp[0]);
+//		vec67Y.setProgress(temp[1]);
+//		vec67Z.setProgress(temp[2]);
+//		vec67X.setOnSeekBarChangeListener(this);
+//		vec67Y.setOnSeekBarChangeListener(this);
+//		vec67Z.setOnSeekBarChangeListener(this);
 
 
 
 		//xyz坐标及命令显示
-		xyz=(TextView)findViewById(R.id.textView_Positive);
+		xyz=(TextView)findViewById(R.id.text_infomation);
 		//command=(TextView)findViewById(R.id.textView_Command);
 
+
+		/*
 		//z轴移动
 		moveZ=(SeekBar)findViewById(R.id.seekBar);
 		moveZ.setMax(300);
 		moveZ.setOnSeekBarChangeListener(this);
 		moveZ.setProgress(arm7Bot.getPosition()[2]+50);
 		moveZ.setProgress(arm7Bot.getPosition()[2]+50);
+		*/
+
+
 		//自定义移动控件myRock
 		myRock=(RockerView)findViewById(R.id.view) ;
 		myRock.setContext(this);
@@ -223,7 +248,7 @@ public class chatActivity extends Activity implements   SeekBar.OnSeekBarChangeL
 		};
 	}
 
-
+/*
 
 	@Override
 	public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
@@ -271,6 +296,7 @@ public class chatActivity extends Activity implements   SeekBar.OnSeekBarChangeL
 	public void onStopTrackingTouch(SeekBar seekBar) {
 
 	}
+*/
 
 
 	@Override
@@ -278,6 +304,7 @@ public class chatActivity extends Activity implements   SeekBar.OnSeekBarChangeL
 		super.onPause();
 	}
 
+	// 设置横屏并且取消蓝牙
 	@Override
 	public synchronized void onResume() {
 		/**
@@ -316,10 +343,10 @@ public class chatActivity extends Activity implements   SeekBar.OnSeekBarChangeL
 		}
 	}
 
+	//初始化内容
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-
 		if (Bluetooth.serviceOrCilent == ServerOrCilent.CILENT)
 		{
 			shutdownClient();
@@ -331,13 +358,17 @@ public class chatActivity extends Activity implements   SeekBar.OnSeekBarChangeL
 		Bluetooth.isOpen = false;
 		Bluetooth.serviceOrCilent = ServerOrCilent.NONE;
 	}
+
+
 	private void messageShow(byte[] message){
 		int[] position=arm7Bot.getPosition();
-		//command.setText(bytesToHexString(message));
 		xyz.setText("x = "+position[0]+"\n"+"y = "+position[1]+"\n"+"z = "+position[2]+"\n");
 		Log.d("Test",position[0]+"  "+position[1]+"  "+position[2]+"  ");
 		Log.d("Test",bytesToHexString(arm7Bot.getIK6()));
 	}
+
+
+
 
 	@Override
 	public void onClick(View view) {
@@ -365,8 +396,8 @@ public class chatActivity extends Activity implements   SeekBar.OnSeekBarChangeL
 			sendMessageHandle(test);
 			int[] temp={0,175,100};
 			arm7Bot.setPosition(temp);
-			moveZ.setProgress(temp[2]+50);
-			moveZ.setProgress(temp[2]+50);
+//			moveZ.setProgress(temp[2]+50);
+//			moveZ.setProgress(temp[2]+50);
 			myRock.setContext(mychatActivity);
 			messageShow(arm7Bot.getIK6());
 		}
@@ -383,11 +414,74 @@ public class chatActivity extends Activity implements   SeekBar.OnSeekBarChangeL
 			//command.setText(bytesToHexString(arm7Bot.getMotorPosition()));
 			sendMessageHandle(arm7Bot.getMotorPosition());
 		}
-
-
 	}
 
+
+
 	/*-------------------------------------------蓝牙相关--------------------------------------------------*/
+
+
+	//发送数据
+	private void sendMessageHandle(byte[] msg)
+	{
+		if (socket == null)
+		{
+			Toast.makeText(mContext, "没有连接", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		try {
+			OutputStream os = socket.getOutputStream();
+			os.write(msg);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+
+	//读取数据
+	private class readThread extends Thread {
+		public void run() {
+			byte[] buffer = new byte[1024];
+			int bytes;
+			InputStream mmInStream = null;
+
+			try {
+				mmInStream = socket.getInputStream();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			while (true) {
+				try {
+					// Read from the InputStream
+					if( (bytes = mmInStream.read(buffer)) > 0 )
+					{
+						int[] buf_data = new int[bytes];
+						for(int i=0; i<bytes; i++)
+						{
+							buf_data[i] = buffer[i];
+						}
+						Bundle data=new Bundle();
+						data.putIntArray("receiver",buf_data);
+						Message msg = new Message();
+						msg.obj = data;
+						msg.what = 1;
+						updateUI.sendMessage(msg);
+					}
+				} catch (IOException e) {
+					try {
+						mmInStream.close();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					break;
+				}
+			}
+		}
+	}
+
 	//开启客户端
 	private class clientThread extends Thread {
 		public void run() {
@@ -424,7 +518,6 @@ public class chatActivity extends Activity implements   SeekBar.OnSeekBarChangeL
 	};
 
 
-
 	/* 停止客户端连接 */
 	private void shutdownClient() {
 		new Thread() {
@@ -451,87 +544,6 @@ public class chatActivity extends Activity implements   SeekBar.OnSeekBarChangeL
 			};
 		}.start();
 	}
-	//发送数据
-	private void sendMessageHandle(byte[] msg)
-	{
-		if (socket == null)
-		{
-			Toast.makeText(mContext, "没有连接", Toast.LENGTH_SHORT).show();
-			return;
-		}
-		try {
-			OutputStream os = socket.getOutputStream();
-			os.write(msg);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		//list.add(new deviceListItem(msg, false));
-		//mAdapter.notifyDataSetChanged();
-		//mListView.setSelection(list.size() - 1);
-	}
-
-
-	//读取数据
-	private class readThread extends Thread {
-		public void run() {
-			byte[] buffer = new byte[1024];
-			int bytes;
-			InputStream mmInStream = null;
-
-			try {
-				mmInStream = socket.getInputStream();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			while (true) {
-				try {
-					// Read from the InputStream
-					if( (bytes = mmInStream.read(buffer)) > 0 )
-					{
-						int[] buf_data = new int[bytes];
-						for(int i=0; i<bytes; i++)
-						{
-							buf_data[i] = buffer[i];
-						}
-
-						Bundle data=new Bundle();
-						data.putIntArray("receiver",buf_data);
-						Message msg = new Message();
-						msg.obj = data;
-						msg.what = 1;
-						updateUI.sendMessage(msg);
-					}
-				} catch (IOException e) {
-					try {
-						mmInStream.close();
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-					break;
-				}
-			}
-		}
-	}
-
-
-
-
-
-	public class SiriListItem {
-		String message;
-		boolean isSiri;
-
-		public SiriListItem(String msg, boolean siri) {
-			message = msg;
-			isSiri = siri;
-		}
-	}
-
-
-
 
 	public class deviceListItem {
 		String message;

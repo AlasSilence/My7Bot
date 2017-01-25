@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import com.michael.basic7bot.chatActivity;
 
 public class RockerView extends ImageView {
-    private chatActivity mychatActivity;
+	private chatActivity mychatActivity;
 	private MyRocker rocker ;//define custom rocker
 	private float current_X, current_Y;
 	private boolean isRockerCreated = false;//when rocker is created, set true, else set false
@@ -25,11 +25,11 @@ public class RockerView extends ImageView {
 		super(context, attrs);
 	}
 
-    public void setContext(chatActivity myContext){
-        mychatActivity=myContext;
+	public void setContext(chatActivity myContext){
+		mychatActivity=myContext;
 		botX=mychatActivity.getPosition()[0];
 		botY=mychatActivity.getPosition()[1];
-    }
+	}
 
 
 
@@ -79,23 +79,23 @@ public class RockerView extends ImageView {
 
 		switch (event.getAction()) {
 
-		case MotionEvent.ACTION_DOWN:
-			rocker.begin(current_X, current_Y);
-			postInvalidate();//refresh
-			break;
+			case MotionEvent.ACTION_DOWN:
+				rocker.begin(current_X, current_Y);
+				postInvalidate();//refresh
+				break;
 
-		case MotionEvent.ACTION_MOVE:
-			rocker.update(current_X, current_Y);
-			postInvalidate();//refresh
-			break;
+			case MotionEvent.ACTION_MOVE:
+				rocker.update(current_X, current_Y);
+				postInvalidate();//refresh
+				break;
 
-		case MotionEvent.ACTION_UP:
-			rocker.reset();
-			postInvalidate();//refresh
-			break;
+			case MotionEvent.ACTION_UP:
+				rocker.reset();
+				postInvalidate();//refresh
+				break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 		return true;
 	}

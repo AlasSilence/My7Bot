@@ -5,6 +5,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
+
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -21,7 +22,7 @@
             android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:layout_alignParentRight ="true"
-            android:text="IK6Test"/>
+            android:text="复位2"/>
 
         <Button
             android:layout_width="wrap_content"
@@ -34,103 +35,67 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="MotorPosition"
+            android:text="复位1"
             android:id="@+id/btn_motor"
-            android:layout_centerVertical="true"
+            android:layout_alignParentTop="true"
             android:layout_toStartOf="@+id/btn_msg_send" />
     </RelativeLayout>
 
-    <FrameLayout
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_centerVertical="true"
-        android:layout_alignParentEnd="true"
-        android:id="@+id/frameLayout2">
+    <com.michael.basic7bot.util.RockerView
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:id="@+id/view"
+        android:layout_alignTop="@+id/frameLayout2"
+        android:layout_alignParentStart="true" />
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Catch"
-            android:id="@+id/btn_catch"
-            android:layout_gravity="center_horizontal|top" />
+    <FrameLayout
+        android:layout_width="250dp"
+        android:id="@+id/frameLayout2"
+        android:layout_height="200dp"
+        android:layout_centerVertical="true"
+        android:layout_alignParentEnd="true">
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Release"
             android:id="@+id/btn_release"
-            android:layout_gravity="center_horizontal|bottom" />
-    </FrameLayout>
+            android:layout_gravity="right|center_vertical" />
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="250dp"
-        android:layout_height="300dp"
-        android:weightSum="1"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:layout_centerHorizontal="true"
-        android:layout_above="@+id/edit_bottombar"
-        android:layout_below="@+id/seekBar">
-
-        <TextView
+        <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="Small Text"
-            android:id="@+id/vec67"
-            android:layout_gravity="center_horizontal"
-            android:layout_weight="0.21" />
+            android:text="Catch"
+            android:id="@+id/btn_catch"
+            android:layout_gravity="left|center_vertical"
+            />
 
-        <SeekBar
-            android:layout_width="match_parent"
+        <Button
+            android:text="rise"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/vec67.x"
-            android:layout_gravity="center_horizontal"
-            android:layout_weight="0.21"
-            android:indeterminate="false" />
+            android:id="@+id/btn_rise"
+            android:layout_gravity="center_horizontal|top"
+            />
 
-        <SeekBar
-            android:layout_width="match_parent"
+        <Button
+            android:text="drop"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/vec67.y"
-            android:layout_gravity="center_horizontal"
-            android:layout_weight="0.21"
-            android:indeterminate="false" />
+            android:id="@+id/btn_drop"
+            android:layout_gravity="center_horizontal|bottom"
+            />
 
-        <SeekBar
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/vec67.z"
-            android:layout_gravity="center_horizontal"
-            android:layout_weight="0.21"
-            android:indeterminate="false" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="76dp"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="坐标"
-            android:id="@+id/textView_Positive"
-            android:layout_weight="0.21" />
+    </FrameLayout>
 
-    </LinearLayout>
-
-    <SeekBar
-        android:layout_width="wrap_content"
+    <TextView
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:id="@+id/seekBar"
+        android:id="@+id/text_infomation"
         android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:indeterminate="false" />
-
-    <com.michael.basic7bot.util.RockerView
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:id="@+id/view"
-        android:layout_centerVertical="true"
-        android:layout_alignParentStart="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/view" />
 
 
 </RelativeLayout>

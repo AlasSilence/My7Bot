@@ -7,6 +7,10 @@ import android.util.Log;
  * modify by Michael on 2017/01/24
  */
 public class Arm7Bot {
+    public final static  int TYPE_MOVEBYXY = 0;
+    public final static  int TYPE_MOVEBYMOTO = 1;
+
+
     private static int SERVO_NUM=7;
     private int[] INITIAL_POS= {90, 115, 65, 90, 90, 90, 75};//初始角度
     private int[] fluentRangeInit = {2, 2, 2, 2, 2, 2, 2};//流畅度
