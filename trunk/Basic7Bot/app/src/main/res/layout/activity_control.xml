@@ -41,7 +41,7 @@
             android:layout_toStartOf="@+id/btn_msg_send" />
     </RelativeLayout>
 
-    <com.michael.basic7bot.util.RockerView
+    <com.michael.basic7bot.ui.view.RockerView
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:id="@+id/view"
@@ -96,6 +96,8 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_above="@+id/view" />
+
+
 
 
 </RelativeLayout>

@@ -1,4 +1,4 @@
-package com.michael.basic7bot;
+package com.michael.basic7bot.ui;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -20,13 +21,17 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.Set;
-import com.michael.basic7bot.Bluetooth.ServerOrCilent;
-public class deviceActivity extends Activity {
+import com.michael.basic7bot.ui.Bluetooth.ServerOrCilent;
+import com.michael.basic7bot.R;
+import com.michael.basic7bot.ui.adapter.ChatListAdapter;
+import com.michael.basic7bot.ui.adapter.SiriListItem;
+
+public class DeviceActivity extends Activity {
 	/** Called when the activity is first created. */
 
 	private ListView mListView;
 	private ArrayList<SiriListItem> list;
-	private Button seachButton, serviceButton;
+	private Button seachButton;
 	ChatListAdapter mAdapter;
 	Context mContext;
 
@@ -45,7 +50,7 @@ public class deviceActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.devices);
+		setContentView(R.layout.activity_devices);
 		mContext = this;
 		init();
 	}
@@ -81,20 +86,8 @@ public class deviceActivity extends Activity {
 			mAdapter.notifyDataSetChanged();
 			mListView.setSelection(list.size() - 1);
 		}
-
 		seachButton = (Button)findViewById(R.id.start_seach);
 		seachButton.setOnClickListener(seachButtonClickListener);
-
-		serviceButton = (Button)findViewById(R.id.start_service);
-		serviceButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
-				Bluetooth.serviceOrCilent=ServerOrCilent.SERVICE;
-				Bluetooth.mTabHost.setCurrentTab(1);
-			}
-		});
-
 	}
 	private OnClickListener seachButtonClickListener = new OnClickListener() {
 		@Override
@@ -133,21 +126,18 @@ public class deviceActivity extends Activity {
 	private OnItemClickListener mDeviceClickListener = new OnItemClickListener() {
 		public void onItemClick(AdapterView<?> av, View v, int arg2, long arg3) {
 			// Cancel discovery because it's costly and we're about to connect
-
 			SiriListItem item = list.get(arg2);
-			String info = item.message;
+			String info = item.getMessage();
 			String address = info.substring(info.length() - 17);
 			Bluetooth.BlueToothAddress = address;
-
 			AlertDialog.Builder StopDialog =new AlertDialog.Builder(mContext);//定义一个弹出框对象
 			StopDialog.setTitle("连接");//标题
-			StopDialog.setMessage(item.message);
+			StopDialog.setMessage(item.getMessage());
 			StopDialog.setPositiveButton("连接", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 					// TODO Auto-generated method stub
 					mBtAdapter.cancelDiscovery();
 					seachButton.setText("重新搜索");
-
 					Bluetooth.serviceOrCilent=ServerOrCilent.CILENT;
 					Bluetooth.mTabHost.setCurrentTab(1);
 				}
@@ -162,11 +152,11 @@ public class deviceActivity extends Activity {
 	};
 	// The BroadcastReceiver that listens for discovered devices and
 	// changes the title when discovery is finished
+
 	private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			String action = intent.getAction();
-
 			// When discovery finds a device
 			if (BluetoothDevice.ACTION_FOUND.equals(action))
 			{
@@ -195,14 +185,17 @@ public class deviceActivity extends Activity {
 		}
 	};
 
-	public class SiriListItem {
-		String message;
-		boolean isSiri;
-		public SiriListItem(String msg, boolean siri) {
-			message = msg;
-			isSiri = siri;
+	@Override
+	public synchronized void onResume() {
+		/**
+		 * 设置为横屏
+		 */
+		if (getRequestedOrientation() != ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 		}
+		super.onResume();
 	}
+
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();

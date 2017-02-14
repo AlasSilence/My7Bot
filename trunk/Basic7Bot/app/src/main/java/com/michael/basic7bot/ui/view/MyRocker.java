@@ -1,4 +1,4 @@
-package com.michael.basic7bot.util;
+package com.michael.basic7bot.ui.view;
 
 import android.graphics.Canvas;
 import android.graphics.Color;

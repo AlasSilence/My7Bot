@@ -1,9 +1,8 @@
-package com.michael.basic7bot;
+package com.michael.basic7bot.ui;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
@@ -14,11 +13,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,11 +23,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
-import com.michael.basic7bot.Bluetooth.ServerOrCilent;
-import com.michael.basic7bot.model.Arm7Bot;
-import com.michael.basic7bot.util.RockerView;
+import com.michael.basic7bot.ui.Bluetooth.ServerOrCilent;
+import com.michael.basic7bot.R;
+import com.michael.basic7bot.arm7bot.Arm7Bot;
+import com.michael.basic7bot.ui.view.RockerView;
 
-public class chatActivity extends Activity implements OnClickListener {
+public class ChatActivity extends Activity implements OnClickListener {
 	/** Called when the activity is first created. */
 	//	private Button upButton,downButton,leftButton,rightButton;
 
@@ -46,12 +42,6 @@ public class chatActivity extends Activity implements OnClickListener {
 	private Button rise,drop;
 	private TextView xyz;
 
-	/* 一些常量，代表服务器的名称 以及蓝牙变量 */
-	public static final String PROTOCOL_SCHEME_L2CAP = "btl2cap";
-	public static final String PROTOCOL_SCHEME_RFCOMM = "btspp";
-	public static final String PROTOCOL_SCHEME_BT_OBEX = "btgoep";
-	public static final String PROTOCOL_SCHEME_TCP_OBEX = "tcpobex";
-	private BluetoothServerSocket mserverSocket = null;
 
 	private clientThread clientConnectThread = null;
 	private BluetoothSocket socket = null;
@@ -63,7 +53,7 @@ public class chatActivity extends Activity implements OnClickListener {
 	//机械手需要使用的变量及控制
 	Arm7Bot arm7Bot=new Arm7Bot();
 
-	private chatActivity mychatActivity;
+	private ChatActivity mychatActivity;
 	Context mContext;
 	private RockerView myRock;
 	private Handler updateUI;
@@ -144,7 +134,7 @@ public class chatActivity extends Activity implements OnClickListener {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.chat2);
+		setContentView(R.layout.activity_control);
 		mContext = this;
 		mychatActivity=this;
 		init();
@@ -188,39 +178,8 @@ public class chatActivity extends Activity implements OnClickListener {
 			}
 		});
 
-
-		/*****转轴方向测试*****/
-//		vec67=(TextView)findViewById(R.id.vec67);
-//		vec67X=(SeekBar)findViewById(R.id.vec67_x) ;
-//		vec67Y=(SeekBar)findViewById(R.id.vec67_y);
-//		vec67Z=(SeekBar)findViewById(R.id.vec67_z);
-//		vec67Z.setMax(90);
-//		vec67Y.setMax(500);
-//		vec67X.setMax(500);
-//		int[] temp=arm7Bot.getDirection();
-//		vec67X.setProgress(temp[0]);
-//		vec67Y.setProgress(temp[1]);
-//		vec67Z.setProgress(temp[2]);
-//		vec67X.setOnSeekBarChangeListener(this);
-//		vec67Y.setOnSeekBarChangeListener(this);
-//		vec67Z.setOnSeekBarChangeListener(this);
-
-
-
 		//xyz坐标及命令显示
 		xyz=(TextView)findViewById(R.id.text_infomation);
-		//command=(TextView)findViewById(R.id.textView_Command);
-
-
-		/*
-		//z轴移动
-		moveZ=(SeekBar)findViewById(R.id.seekBar);
-		moveZ.setMax(300);
-		moveZ.setOnSeekBarChangeListener(this);
-		moveZ.setProgress(arm7Bot.getPosition()[2]+50);
-		moveZ.setProgress(arm7Bot.getPosition()[2]+50);
-		*/
-
 
 		//自定义移动控件myRock
 		myRock=(RockerView)findViewById(R.id.view) ;
@@ -247,57 +206,6 @@ public class chatActivity extends Activity implements OnClickListener {
 			}
 		};
 	}
-
-/*
-
-	@Override
-	public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
-		if(seekBar.getId()==moveZ.getId()){
-			int[] position=arm7Bot.getPosition();
-			progress=progress-50;
-			arm7Bot.getPosition()[2]=progress;
-			moveZ(progress);
-		}
-		else if(seekBar.getId()==vec67X.getId()){
-			int[] temp=arm7Bot.getDirection();
-			progress=progress-250;
-			arm7Bot.getDirection()[0]=progress;
-			newPostion();
-		}
-		else if(seekBar.getId()==vec67Y.getId()){
-			int[] temp=arm7Bot.getDirection();
-			progress=progress-250;
-			arm7Bot.getDirection()[1]=progress;
-			newPostion();
-		}
-		else if(seekBar.getId()==vec67Z.getId()){
-			int lengh=1000;
-			//按角度移动机械手
-			if(progress<45){
-				arm7Bot.getDirection()[0]=Math.abs((int)(lengh*Math.cos(((45-progress)*Math.PI)/180)));
-				arm7Bot.getDirection()[1]=-Math.abs((int)(lengh*Math.sin(((45-progress)*Math.PI)/180)));
-			}
-			else{
-				arm7Bot.getDirection()[0]=Math.abs((int)(lengh*Math.cos(((progress-45)*Math.PI)/180)));
-				arm7Bot.getDirection()[1]=Math.abs((int)(lengh*Math.sin(((progress-45)*Math.PI)/180)));
-			}
-			Log.d("what",arm7Bot.getDirection()[0]+"  "+arm7Bot.getDirection()[1]);
-			newPostion();
-
-		}
-	}
-
-	@Override
-	public void onStartTrackingTouch(SeekBar seekBar) {
-
-	}
-
-	@Override
-	public void onStopTrackingTouch(SeekBar seekBar) {
-
-	}
-*/
-
 
 	@Override
 	public synchronized void onPause() {
@@ -337,8 +245,6 @@ public class chatActivity extends Activity implements OnClickListener {
 		}
 		else if(Bluetooth.serviceOrCilent==ServerOrCilent.SERVICE)
 		{
-//			startServerThread = new ServerThread();
-//			startServerThread.start();
 			Bluetooth.isOpen = true;
 		}
 	}
@@ -375,7 +281,7 @@ public class chatActivity extends Activity implements OnClickListener {
 		if(view.getId()==R.id.btn_mode2){
 			// TODO Auto-generated method stub
 			byte[] test={(byte)0xfe,(byte)0xf5,0x02};
-			sendMessageHandle(arm7Bot.getStatus());
+			sendMessageHandle(test);
 			messageShow(test);
 		}
 		else if(view.getId()==R.id.btn_catch){
@@ -545,13 +451,4 @@ public class chatActivity extends Activity implements OnClickListener {
 		}.start();
 	}
 
-	public class deviceListItem {
-		String message;
-		boolean isSiri;
-
-		public deviceListItem(String msg, boolean siri) {
-			message = msg;
-			isSiri = siri;
-		}
-	}
 }

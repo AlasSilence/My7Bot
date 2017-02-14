@@ -1,10 +1,10 @@
-package com.michael.basic7bot.model;
+package com.michael.basic7bot.arm7bot.model;
 
 /**
  * Created by Michael on 2016/9/9 0009.
  */
 public class PVector {
-    double x,y,z;
+    public double x,y,z;
     public PVector(){
         this.x = this.y = this.z = 0.0;
     }

@@ -11,15 +11,15 @@
         >
         <!--android:theme="@android:style/Theme.NoTitleBar.Fullscreen"-->
 
-        <activity android:name=".Bluetooth"
+        <activity android:name=".ui.Bluetooth"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".chatActivity" />
-        <activity android:name="com.michael.basic7bot.deviceActivity" />
+        <activity android:name=".ui.ChatActivity" />
+        <activity android:name="com.michael.basic7bot.ui.DeviceActivity" />
 
     </application>
 

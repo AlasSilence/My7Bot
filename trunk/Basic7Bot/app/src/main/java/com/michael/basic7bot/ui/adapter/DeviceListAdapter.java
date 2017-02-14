@@ -1,4 +1,4 @@
-package com.michael.basic7bot;
+package com.michael.basic7bot.ui.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -7,14 +7,17 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+
+import com.michael.basic7bot.R;
+
 import java.util.ArrayList;
 
-public class ChatListAdapter extends BaseAdapter {
-    private ArrayList<deviceActivity.SiriListItem> list;
+public class DeviceListAdapter extends BaseAdapter {
+    private ArrayList<DeviceListItem> list;
     private LayoutInflater mInflater;
-  
-    public ChatListAdapter(Context context, ArrayList<deviceActivity.SiriListItem> list2) {
-    	list = list2;
+
+    public DeviceListAdapter(Context context, ArrayList<DeviceListItem> l) {
+    	list = l;
 		mInflater = LayoutInflater.from(context);
     }
 
@@ -36,9 +39,9 @@ public class ChatListAdapter extends BaseAdapter {
 
     public View getView(int position, View convertView, ViewGroup parent) {
     	ViewHolder viewHolder = null;
-    	deviceActivity.SiriListItem item=list.get(position);
+        DeviceListItem item=list.get(position);
         if(convertView == null){
-        	convertView = mInflater.inflate(R.layout.list_item, null);          
+        	convertView = mInflater.inflate(R.layout.list_item, null);
         	viewHolder=new ViewHolder(
         			(View) convertView.findViewById(R.id.list_child),
         			(TextView) convertView.findViewById(R.id.chat_msg)
@@ -49,7 +52,7 @@ public class ChatListAdapter extends BaseAdapter {
         	viewHolder = (ViewHolder)convertView.getTag();
         }       
         
-        if(item.isSiri)
+        if(item.isSiri())
         {
         	viewHolder.child.setBackgroundResource(R.drawable.msgbox_rec);
         }
@@ -57,7 +60,7 @@ public class ChatListAdapter extends BaseAdapter {
         {
         	viewHolder.child.setBackgroundResource(R.drawable.msgbox_send);
         }
-        viewHolder.msg.setText(item.message);    
+        viewHolder.msg.setText(item.getMessage());
         
         return convertView;
     }

@@ -1,37 +1,27 @@
-package com.michael.basic7bot.model;
+package com.michael.basic7bot.arm7bot;
 
-import android.util.Log;
+import com.michael.basic7bot.arm7bot.model.PVector;
 
 /**
- * Created by Michael on 2016/9/9 0009.
- * modify by Michael on 2017/01/24
+ * Created by MichaelJiang on 2017/2/14.
  */
-public class Arm7Bot {
-    public final static  int TYPE_MOVEBYXY = 0;
-    public final static  int TYPE_MOVEBYMOTO = 1;
 
+public class Arm7Bot_Check {
 
-    private static int SERVO_NUM=7;
-    private int[] INITIAL_POS= {90, 115, 65, 90, 90, 90, 75};//初始角度
-    private int[] fluentRangeInit = {2, 2, 2, 2, 2, 2, 2};//流畅度
-    private boolean[] reverse = {true, false, false, false, false, false, true};
-    private double[] offsetInit = {0, 0, 0, 0, 0, 0, -50.0};  // Unit: Degree
+    /*****Arm7Bot固定参数*****/
+    private double[] theta = new double[Arm7Bot.getServoNum()];//保存各舵机移动所需要的角度
+    private PVector[] joint = new PVector[9];
+
+    /*****Arm7Bot固定参数*****/
     private double[] thetaMin = { 0,  0, -1.134464,  0.17453292,  0,  0, 0};
     private double[] thetaMax = {Math.PI, Math.PI, 2.0071287, 2.9670596, Math.PI, Math.PI, Math.PI/2};
-
-    double a=120.0, b=40.0, c=198.50, d=30.05, e=77.80, f=22.10, g=12.0, h = 29.42;
-    private byte[] IK6={(byte)0xfe,(byte)0xFA,0x08,0x00,0x01,0x2F,0x00,0x64,0x08,0x00,0x08,0x00, 0x09,0x44,0x01,0x48,0x01,0x48,0x01,0x48,0x01,0x48};
-    private byte[] status={(byte)0xfe,(byte)0xf5,0x02};
-    private byte[] motorPosition={(byte)0xfe,(byte)0xf9,0x03,0x74,0x03,0x74,0x02,0x69,0x03,0x74,0x03,0x74,0x03,0x74,0x01,0x48};//16
-    private int[] position={0,175,100};
-    private int[] direction={100,100,100};
-
-    /*****检测是否符合IK6用*****/
-    double[] theta = new double[SERVO_NUM];//保存各舵机移动所需要的角度
-    PVector[] joint = new PVector[9];
+    private double a=120.0, b=40.0, c=198.50, d=30.05, e=77.80, f=22.10, g=12.0, h = 29.42;
     private PVector j6=new PVector(),vec56 = new PVector(),vec67 = new PVector();
 
-    public Arm7Bot(){
+    /**
+     * 初始化Arm7Bot_Check初始化一次后无需进行重复初始化
+     */
+    public Arm7Bot_Check(){
         for(int i=0;i<joint.length;i++){
             joint[i]=new PVector();
         }
@@ -40,101 +30,14 @@ public class Arm7Bot {
         }
     }
 
-    public int[] getPosition(){
-        return position;
-    }
-    public byte[] getIK6(){
-        return IK6;
-    }
-
-    public byte[] getMotorPosition() {
-        return motorPosition;
-    }
-
-    public byte[] getStatus() {
-        return status;
-    }
-
-    public int[] getDirection() {
-        return direction;
-    }
-
-    public void setDirection(int[] direction) {
-        this.direction = direction;
-    }
-
-    public void setIK6(byte[] IK6) {
-        this.IK6 = IK6;
-    }
-
-    public void setMotorPosition(byte[] motorPosition) {
-        this.motorPosition = motorPosition;
-    }
-
-    public void setPosition(int[] position) {
-        this.position = position;
-    }
-
-    public void setStatus(byte[] status) {
-        this.status = status;
-    }
-
-    public  void change(){
-        int j=0;
-        for(int i=2;i<7;i=i+2){
-            if(position[j]>0){
-                IK6[i]=(byte)((position[j]/128)&0x7F);
-                IK6[i+1]=(byte)(position[j++]&0x7F);
-            }
-            else{
-                IK6[i]=(byte) (((byte)((-position[j]/128)&0x7F))|0x08);
-                IK6[i+1]=(byte)(-position[j++]&0x7F);
-            }
-        }
-    }
-
-    public void newChange(){
-        //x,y成比例可以保持他他的向量朝向
-        Log.d("ni","x = "+direction[0]+"\t"+"y = "+direction[1]+"\t"+"z = "+direction[2]+"\t");
-        int j=0;
-        for(int i=14;i<19;i=i+2){
-            if(direction[j]>0){
-                IK6[i]=(byte)((direction[j]/128)&0x7F);
-                IK6[i+1]=(byte)(direction[j++]&0x7F);
-            }
-            else{
-                IK6[i]=(byte) (((byte)((-direction[j]/128)&0x7F))|0x08);
-                IK6[i+1]=(byte)(-direction[j++]&0x7F);
-            }
-        }
-    }
-
-    /*****上位机接受到arduinoDue发回的数据并解析现在各舵机的角度*****/
-    public static void analysisReceived(int[] command){
-        int[] motor=new int[7];
-        int[] force=new int[7];
-        int flag=command[16];
-        int mul;
-        String result="";
-        for(int i=1;i<8;i++){
-            motor[i-1]=(command[i*2]&0x07)*128+(command[i*2+1]);
-            force[i-1]=command[i*2]>>3;
-            mul=1;if(force[i-1]>7)mul=-1;force[i-1]=(force[i-1]&0x07)*mul;
-            result+="motor"+i+" = "+motor[i-1]+"     "+(motor[i-1]/1000.0*180.0);
-            result+="\t"+force[i-1];
-        }
-        if(flag==1){
-
-        }
-        else {
-            result+="移动";
-        }
-        Log.d("Di",result);
-    }
-
-
-    /*****加装自己受到了command信号 进行解析，查看发送的指令是否能够移动*****/
-    public boolean receiveIK6(){
+    /**
+     * @param IK6 符合Arm7Bot通讯指令的一串byte数组
+     * 样例：  private byte[] IK6={(byte)0xfe,(byte)0xFA,0x08,0x00,0x01,0x2F,0x00,0x64,0x08,0x00,0x08,0x00, 0x09,0x44,0x01,0x48,0x01,0x48,0x01,0x48,0x01,0x48};
+     * @return
+     * 如果符合要求则返回true
+     * 如果不符合要求则返回false
+     */
+    public boolean checkSendIK6(byte[] IK6){
         int[] data=new int[10];
         int j=0;
         double theta6;
@@ -156,31 +59,17 @@ public class Arm7Bot {
         mul = 1; if (data[8] > 1024) mul = -1; vec67.z = data[8] % 1024 * mul;
 
         theta6 = ((double)(data[9])) * 9 / 50;
+
         if(checkIK6(j6,vec56,vec67)==0)
             return true;
         else
             return false;
     }
 
-    public void changdirection(){
-        int j=0;
-        for(int i=8;i<13;i=i+2){
-            if(direction[j]>0){
-                IK6[i]=(byte)((direction[j]/128)&0x7F);
-                IK6[i+1]=(byte)(direction[j++]&0x7F);
-            }
-            else{
-                IK6[i]=(byte) (((byte)((-direction[j]/128)&0x7F))|0x08);
-                IK6[i+1]=(byte)(-direction[j++]&0x7F);
-            }
-        }
-    }
-
     public int checkIK6(PVector j6, PVector vec56_d, PVector vec67_d){
         int status = -1;
         int IK5_status = checkIK5(j6, vec56_d);
         if (IK5_status != 0) return IK5_status;
-
         PVector vec67_u = new PVector(vec67_d.x, vec67_d.y, vec67_d.z);
         vec67_u.normalize();
         PVector j7 = new PVector(j6.x + g * vec67_u.x, j6.y + g * vec67_u.y, j6.z + g * vec67_u.z);
@@ -195,9 +84,8 @@ public class Arm7Bot {
         if (vec67_d.x < 0) theta[5] = -theta[5];
         if (theta[5] < 0) theta[5] = Math.PI + theta[5];
         calcJoints();
-
         return 0;
-    }
+    }//检查IK6发送是否合理
 
     public int checkIK5(PVector j6, PVector vec56_d) {
         int status = -1;
@@ -234,7 +122,7 @@ public class Arm7Bot {
         } else {
             return 2;
         }
-    }
+    }//检查IK5发送是否合理
 
     public int checkIk3(PVector pt){
         double x = pt.x, y = pt.y, z = pt.z;
@@ -256,13 +144,12 @@ public class Arm7Bot {
 
         // range check
         if (theta[1] > thetaMin[1] && theta[1] < thetaMax[1] &&
-
                 theta[2] > thetaMin[2] && theta[2] < thetaMax[2] &&
                 theta[2] - 0.8203047 + theta[1] < Math.PI && theta[2] + theta[1] > 1.44862327) {
             status = 0;
         }
         return status;
-    }
+    }//检查IK3发送是否合理
 
     private PVector calcProjectionPt(PVector pt0, PVector pt1, PVector nVec) {
         PVector n = new PVector(nVec.x, nVec.y, nVec.z);

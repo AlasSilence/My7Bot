@@ -1,4 +1,4 @@
-package com.michael.basic7bot;
+package com.michael.basic7bot.ui;
 
 import android.content.Context;
 import android.util.AttributeSet;

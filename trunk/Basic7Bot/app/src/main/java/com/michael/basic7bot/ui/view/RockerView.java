@@ -1,4 +1,4 @@
-package com.michael.basic7bot.util;
+package com.michael.basic7bot.ui.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -6,10 +6,10 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.ImageView;
 
-import com.michael.basic7bot.chatActivity;
+import com.michael.basic7bot.ui.ChatActivity;
 
 public class RockerView extends ImageView {
-	private chatActivity mychatActivity;
+	private ChatActivity mychatActivity;
 	private MyRocker rocker ;//define custom rocker
 	private float current_X, current_Y;
 	private boolean isRockerCreated = false;//when rocker is created, set true, else set false
@@ -25,7 +25,7 @@ public class RockerView extends ImageView {
 		super(context, attrs);
 	}
 
-	public void setContext(chatActivity myContext){
+	public void setContext(ChatActivity myContext){
 		mychatActivity=myContext;
 		botX=mychatActivity.getPosition()[0];
 		botY=mychatActivity.getPosition()[1];
