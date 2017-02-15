@@ -35,7 +35,6 @@ public class Arm7Bot_Receiver {
             result+="移动";
         }
         calibrationPosition(motor);
-
-        Log.d("Di", Tools.bytesToHexString(test));
+//        Log.d("Di", Tools.bytesToHexString(test));
     }
 }

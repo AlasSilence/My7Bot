@@ -37,6 +37,7 @@ public class Arm7Bot_Check {
      * 如果符合要求则返回true
      * 如果不符合要求则返回false
      */
+
     public boolean checkSendIK6(byte[] IK6){
         int[] data=new int[10];
         int j=0;

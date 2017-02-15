@@ -21,7 +21,8 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.Set;
-import com.michael.basic7bot.ui.Bluetooth.ServerOrCilent;
+
+import com.michael.basic7bot.bloothtooth.BluetoothService;
 import com.michael.basic7bot.R;
 import com.michael.basic7bot.ui.adapter.ChatListAdapter;
 import com.michael.basic7bot.ui.adapter.SiriListItem;
@@ -129,7 +130,7 @@ public class DeviceActivity extends Activity {
 			SiriListItem item = list.get(arg2);
 			String info = item.getMessage();
 			String address = info.substring(info.length() - 17);
-			Bluetooth.BlueToothAddress = address;
+			BluetoothService.BlueToothAddress = address;
 			AlertDialog.Builder StopDialog =new AlertDialog.Builder(mContext);//定义一个弹出框对象
 			StopDialog.setTitle("连接");//标题
 			StopDialog.setMessage(item.getMessage());
@@ -138,13 +139,12 @@ public class DeviceActivity extends Activity {
 					// TODO Auto-generated method stub
 					mBtAdapter.cancelDiscovery();
 					seachButton.setText("重新搜索");
-					Bluetooth.serviceOrCilent=ServerOrCilent.CILENT;
 					Bluetooth.mTabHost.setCurrentTab(1);
 				}
 			});
 			StopDialog.setNegativeButton("取消",new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
-					Bluetooth.BlueToothAddress = null;
+					BluetoothService.BlueToothAddress = null;
 				}
 			});
 			StopDialog.show();

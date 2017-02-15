@@ -11,22 +11,13 @@ import android.widget.TabHost.OnTabChangeListener;
 import android.widget.Toast;
 
 import com.michael.basic7bot.R;
+import com.michael.basic7bot.bloothtooth.BluetoothService;
 
 @SuppressWarnings("deprecation")
 public class Bluetooth extends TabActivity {
 	/** Called when the activity is first created. */
-
-	enum ServerOrCilent{
-		NONE,
-		SERVICE,
-		CILENT
-	};
 	private Context mContext;
 	static AnimationTabHost mTabHost;
-	static String BlueToothAddress = "null";
-	static ServerOrCilent serviceOrCilent = ServerOrCilent.NONE;
-	static boolean isOpen = false;
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
