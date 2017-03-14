@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.michael.basic7bot">
+    package="me.michaeljiang.basic7bot">
 
     <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -19,8 +19,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.ChatActivity" />
-        <activity android:name="com.michael.basic7bot.ui.DeviceActivity" />
+        <activity android:name="me.michaeljiang.basic7bot.ui.DeviceActivity" />
 
     </application>
+
 
 </manifest>

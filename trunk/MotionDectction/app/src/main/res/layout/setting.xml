@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:opencv="http://schemas.android.com/apk/res-auto"
+    android:layout_height="match_parent">
+
+    <Button
+        android:text="重置B"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/savepostion1"
+        android:layout_toEndOf="@+id/savepostion1"
+        android:layout_marginStart="51dp"
+        android:id="@+id/savepostion2" />
+
+    <Button
+        android:text="重置D"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/savepostion3"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="36dp"
+        android:id="@+id/savepostion4" />
+
+    <Button
+        android:text="C"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/postion2"
+        android:layout_alignStart="@+id/savepostion3"
+        android:id="@+id/postion3" />
+
+    <Button
+        android:text="D"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/postion3"
+        android:layout_alignStart="@+id/savepostion4"
+        android:id="@+id/postion4" />
+
+    <TextView
+        android:text="Postion:"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/txt_title"
+        android:layout_above="@+id/postion1"
+        android:layout_toStartOf="@+id/postion1" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="20dp"
+        android:layout_alignParentTop="true"
+        android:id="@+id/txt_info"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/txt_title"
+/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/edit_bottombar"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true">
+
+        <Button
+            android:id="@+id/btn_disconnect"
+            android:layout_width="65dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:text="断开" />
+
+        <Button
+            android:id="@+id/btn_start"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="开始" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="保护模式"
+            android:id="@+id/btn_mode2"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="自由模式"
+            android:id="@+id/btn_mode1"
+            android:layout_alignParentTop="true"
+            android:layout_toStartOf="@+id/btn_mode2" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="返回"
+            android:id="@+id/btn_motor"
+            android:layout_alignParentTop="true"
+            android:layout_toStartOf="@+id/btn_start" />
+
+        <Button
+            android:text="重置返回点"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_rest"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/btn_mode2" />
+    </RelativeLayout>
+
+    <Button
+        android:text="重置A"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/savepostion1"
+        android:layout_marginStart="47dp"
+        android:layout_above="@+id/edit_bottombar"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:text="A"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/postion1"
+        android:layout_above="@+id/savepostion1"
+        android:layout_alignStart="@+id/savepostion1" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/txt_info"
+        android:layout_toEndOf="@+id/txt_title"
+        android:layout_above="@+id/postion2">
+        <org.opencv.android.JavaCameraView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            android:id="@+id/camera"
+            opencv:show_fps="true"
+            opencv:camera_id="any" />
+    </FrameLayout>
+
+    <Button
+        android:text="重置C"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/savepostion3"
+        android:layout_below="@+id/postion3"
+        android:layout_toStartOf="@+id/savepostion4"
+        android:layout_marginEnd="39dp" />
+
+    <Button
+        android:text="B"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/postion2"
+        android:layout_above="@+id/savepostion2"
+        android:layout_alignStart="@+id/savepostion2" />
+
+</RelativeLayout>
